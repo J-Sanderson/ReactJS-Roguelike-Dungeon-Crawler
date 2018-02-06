@@ -1,0 +1,29 @@
+#main {
+  border: 1px solid red;
+}
+#main #status {
+  border: 1px solid blue;
+  /*width:19%;
+  float:left;*/
+}
+#main #status #statuslog {
+  border: 1px solid orange;
+  height: 50px;
+  overflow: scroll;
+}
+#main #screen {
+  border: 1px solid green;
+  width: 61%;
+  /*float:left;*/
+}
+#main #screen #gridCanvas {
+  border: 10px solid black;
+  display: block;
+  margin: auto;
+}
+#main #controls {
+  border: 1px solid purple;
+  /*width:19%;
+  float:left;
+  */
+}
