@@ -7,7 +7,7 @@ var MAXROOMS = 13; //15
 var MINROOMS = 7; //10
 var MAXITEM = 10; //# of items/monsters
 var MINITEM = 6;
-var WEAPONS = [{ name: "bare hands", strength: 0 }, { name: "pointed stick", strength: 10 }, { name: "L2 weapon", strength: 20 }, { name: "L3 weapon", strength: 30 }, { name: "slice of mango", strength: 40 }];
+var WEAPONS = [{ name: "bare hands", strength: 0 }, { name: "pointed stick", strength: 10 }, { name: "L2 weapon", strength: 20 }, { name: "L3 weapon", strength: 30 }, { name: "sharp slice of mango", strength: 40 }];
 var MONSTERS = [{ name: "Ubiquitous Bat", HP: 50, attack: 10 }, { name: "L2 monster", HP: 70, attack: 20 }, { name: "L3 monster", HP: 90, attack: 30 }, { name: "Killer Rabbit", HP: 110, attack: 40 }];
 
 var Status = React.createClass({
@@ -40,7 +40,9 @@ var Status = React.createClass({
       React.createElement(
         "p",
         null,
-        "Level up in (num) EXP"
+        "Level up in ",
+        this.props.playerStats.toNextLevel,
+        " EXP"
       ),
       React.createElement(
         "div",
@@ -59,62 +61,67 @@ var Screen = React.createClass({
     canvas.width = BOARDSIZE * 10;
     canvas.height = BOARDSIZE * 10;
     var ctx = canvas.getContext("2d");
-    //draw the board
-    for (var i = 0; i < this.props.board.length; i++) {if (window.CP.shouldStopExecution(2)){break;}
-      for (var j = 0; j < this.props.board.length; j++) {if (window.CP.shouldStopExecution(1)){break;}
-        ctx.beginPath();
-        ctx.strokeStyle = "black";
-        ctx.fillStyle = this.props.board[i][j] ? "white" : "grey";
-        ctx.lineWidth = 0.1;
-        ctx.rect(i * 10, j * 10, 10, 10);
-        ctx.fill();
-        ctx.stroke();
-      }
+    //draw board etc if player is still alive
+    if (this.props.playerStats.currHP > 0) {
+      //draw the board
+      for (var i = 0; i < this.props.board.length; i++) {if (window.CP.shouldStopExecution(2)){break;}
+        for (var j = 0; j < this.props.board.length; j++) {if (window.CP.shouldStopExecution(1)){break;}
+          ctx.beginPath();
+          ctx.strokeStyle = "black";
+          ctx.fillStyle = this.props.board[i][j] ? "white" : "grey";
+          ctx.lineWidth = 0.1;
+          ctx.rect(i * 10, j * 10, 10, 10);
+          ctx.fill();
+          ctx.stroke();
+        }
 window.CP.exitedLoop(1);
 
-    }
+      }
 window.CP.exitedLoop(2);
 
-    //place monsters
-    for (var i = 0; i < this.props.monsters.length; i++) {if (window.CP.shouldStopExecution(3)){break;}
-      if (this.props.monsters[i].display) {
-        //only show undefeated monsters
-        ctx.beginPath();
-        ctx.fillStyle = "blue";
-        ctx.rect(this.props.monsters[i].row * 10, this.props.monsters[i].col * 10, 10, 10);
-        ctx.fill();
+      //place monsters
+      for (var i = 0; i < this.props.monsters.length; i++) {if (window.CP.shouldStopExecution(3)){break;}
+        if (this.props.monsters[i].display) {
+          //only show undefeated monsters
+          ctx.beginPath();
+          ctx.fillStyle = "blue";
+          ctx.rect(this.props.monsters[i].row * 10, this.props.monsters[i].col * 10, 10, 10);
+          ctx.fill();
+        }
       }
-    }
 window.CP.exitedLoop(3);
 
-    //place heals
-    for (var i = 0; i < this.props.heals.length; i++) {if (window.CP.shouldStopExecution(4)){break;}
-      if (this.props.heals[i].display) {
-        ctx.beginPath();
-        ctx.fillStyle = "purple";
-        ctx.rect(this.props.heals[i].row * 10, this.props.heals[i].col * 10, 10, 10);
-        ctx.fill();
+      //place heals
+      for (var i = 0; i < this.props.heals.length; i++) {if (window.CP.shouldStopExecution(4)){break;}
+        if (this.props.heals[i].display) {
+          ctx.beginPath();
+          ctx.fillStyle = "purple";
+          ctx.rect(this.props.heals[i].row * 10, this.props.heals[i].col * 10, 10, 10);
+          ctx.fill();
+        }
       }
-    }
 window.CP.exitedLoop(4);
 
-    //place weapon
-    if (this.props.weaponPos.display) {
+      //place weapon
+      if (this.props.weaponPos.display) {
+        ctx.beginPath();
+        ctx.fillStyle = "gold";
+        ctx.rect(this.props.weaponPos.col * 10, this.props.weaponPos.row * 10, 10, 10);
+        ctx.fill();
+      }
+      //place stairs
       ctx.beginPath();
-      ctx.fillStyle = "gold";
-      ctx.rect(this.props.weaponPos.col * 10, this.props.weaponPos.row * 10, 10, 10);
+      ctx.fillStyle = "red";
+      ctx.rect(this.props.stairPos.colPos * 10, this.props.stairPos.rowPos * 10, 10, 10);
       ctx.fill();
+      //place player
+      ctx.beginPath();
+      ctx.fillStyle = "green";
+      ctx.rect(this.props.playerPos.colPos * 10, this.props.playerPos.rowPos * 10, 10, 10);
+      ctx.fill();
+    } else {
+      //render death screen?
     }
-    //place stairs
-    ctx.beginPath();
-    ctx.fillStyle = "red";
-    ctx.rect(this.props.stairPos.colPos * 10, this.props.stairPos.rowPos * 10, 10, 10);
-    ctx.fill();
-    //place player
-    ctx.beginPath();
-    ctx.fillStyle = "green";
-    ctx.rect(this.props.playerPos.colPos * 10, this.props.playerPos.rowPos * 10, 10, 10);
-    ctx.fill();
   }, //componentDidUpdate
 
   render: function render() {
@@ -160,7 +167,6 @@ var Controls = React.createClass({
     e.preventDefault();
     this.props.moveChar(event.target.id);
   } //handleMove
-
 }); //Controls
 
 var App = React.createClass({
@@ -175,6 +181,7 @@ var App = React.createClass({
       weaponPos: { rowPos: 0, colPos: 0, type: 0, display: true },
       playerStats: {
         level: 1,
+        toNextLevel: 100,
         maxHP: 50,
         currHP: 50,
         baseAttack: 10,
@@ -203,13 +210,12 @@ var App = React.createClass({
         board: this.state.board,
         stairPos: this.state.stairPos,
         playerPos: this.state.playerPos,
+        playerStats: this.state.playerStats,
         weaponPos: this.state.weaponPos,
         monsters: this.state.monsters,
         heals: this.state.heals
       }),
-      React.createElement(Controls, {
-        moveChar: this.moveChar
-      })
+      React.createElement(Controls, { moveChar: this.moveChar })
     );
   }, //render
 
@@ -343,7 +349,7 @@ window.CP.exitedLoop(16);
  //end of room digging loop
 
     //increment level, messages
-    //item and monster types depend on level
+    //monster types depend on level
     //update status message
     var statusLog = this.state.statusLog;
 
@@ -569,10 +575,12 @@ window.CP.exitedLoop(25);
       //update state with new position
       if (shouldMove) {
         this.setState({
-          playerPos: { rowPos: playerRow,
+          playerPos: {
+            rowPos: playerRow,
             colPos: playerCol,
             weaponPos: weapon,
-            statusLog: statusLog }
+            statusLog: statusLog
+          }
         });
       }
     }
@@ -596,6 +604,15 @@ window.CP.exitedLoop(25);
     if (monsters[index].HP <= 0) {
       monsters[index].display = false;
       statusLog.push("You defeated the " + monsters[index].species + "!");
+      //gain exp - temp using monster's attack stat as exp gain?
+      playerStats.toNextLevel -= monsters[index].attack;
+      //did we level up?
+      if (playerStats.toNextLevel <= 0) {
+        statusLog.push("You levelled up!");
+        playerStats.level += 1;
+        playerStats.toNextLevel = playerStats.level * 100;
+        playerStats.maxHP += 20;
+      }
     } else {
       //if we did not defeat it, the monster attacks us next
       var monsterDamage = this.randomNum(Math.round(monsters[index].attack - monsters[index].attack / 2), Math.round(monsters[index].attack + monsters[index].attack / 2));
@@ -608,7 +625,11 @@ window.CP.exitedLoop(25);
         //end game here
       }
     }
-    this.setState({ monsters: monsters, statusLog: statusLog, playerStats: playerStats });
+    this.setState({
+      monsters: monsters,
+      statusLog: statusLog,
+      playerStats: playerStats
+    });
   },
 
   handleStairs: function handleStairs() {
