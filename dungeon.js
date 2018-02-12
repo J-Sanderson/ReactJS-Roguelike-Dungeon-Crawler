@@ -87,6 +87,17 @@ window.CP.exitedLoop(2);
     }
 window.CP.exitedLoop(3);
 
+    //place heals
+    for (var i = 0; i < this.props.heals.length; i++) {if (window.CP.shouldStopExecution(4)){break;}
+      if (this.props.heals[i].display) {
+        ctx.beginPath();
+        ctx.fillStyle = "purple";
+        ctx.rect(this.props.heals[i].row * 10, this.props.heals[i].col * 10, 10, 10);
+        ctx.fill();
+      }
+    }
+window.CP.exitedLoop(4);
+
     //place weapon
     if (this.props.weaponPos.display) {
       ctx.beginPath();
@@ -170,6 +181,7 @@ var App = React.createClass({
         weapon: WEAPONS[0]
       },
       monsters: [],
+      heals: [],
       statusLog: []
     };
   }, //getInitialState
@@ -192,7 +204,8 @@ var App = React.createClass({
         stairPos: this.state.stairPos,
         playerPos: this.state.playerPos,
         weaponPos: this.state.weaponPos,
-        monsters: this.state.monsters
+        monsters: this.state.monsters,
+        heals: this.state.heals
       }),
       React.createElement(Controls, {
         moveChar: this.moveChar
@@ -205,16 +218,16 @@ var App = React.createClass({
     var level = this.state.level;
     //create new blank board
     var tempBoard = [];
-    for (var i = 0; i < BOARDSIZE; i++) {if (window.CP.shouldStopExecution(5)){break;}
+    for (var i = 0; i < BOARDSIZE; i++) {if (window.CP.shouldStopExecution(6)){break;}
       var col = [];
-      for (var j = 0; j < BOARDSIZE; j++) {if (window.CP.shouldStopExecution(4)){break;}
+      for (var j = 0; j < BOARDSIZE; j++) {if (window.CP.shouldStopExecution(5)){break;}
         col.push(false);
       }
-window.CP.exitedLoop(4);
+window.CP.exitedLoop(5);
 
       tempBoard.push(col);
     }
-window.CP.exitedLoop(5);
+window.CP.exitedLoop(6);
 
 
     //dig starter room
@@ -222,23 +235,23 @@ window.CP.exitedLoop(5);
     var startCol = this.randomNum(10, BOARDSIZE - 10);
     var startHeight = this.randomNum(MAXROOMSIZE, MINROOMSIZE);
     var startWidth = this.randomNum(MAXROOMSIZE, MINROOMSIZE);
-    for (var i = startRow; i < startRow + startWidth; i++) {if (window.CP.shouldStopExecution(7)){break;}
-      for (var j = startCol; j < startCol + startHeight; j++) {if (window.CP.shouldStopExecution(6)){break;}
+    for (var i = startRow; i < startRow + startWidth; i++) {if (window.CP.shouldStopExecution(8)){break;}
+      for (var j = startCol; j < startCol + startHeight; j++) {if (window.CP.shouldStopExecution(7)){break;}
         tempBoard[i][j] = true;
       }
-window.CP.exitedLoop(6);
+window.CP.exitedLoop(7);
 
     }
-window.CP.exitedLoop(7);
+window.CP.exitedLoop(8);
 
 
     //get number of remaining rooms to dig...
     var numRooms = this.randomNum(MINROOMS, MAXROOMS);
     //..and dig them
-    for (var i = 0; i < numRooms; i++) {if (window.CP.shouldStopExecution(15)){break;}
+    for (var i = 0; i < numRooms; i++) {if (window.CP.shouldStopExecution(16)){break;}
       //get wall tile next to clear tile to dig from
       var wallFound = false;
-      while (!wallFound) {if (window.CP.shouldStopExecution(8)){break;}
+      while (!wallFound) {if (window.CP.shouldStopExecution(9)){break;}
         //pick random tile
         var randCol = this.randomNum(1, BOARDSIZE - 2);
         var randRow = this.randomNum(1, BOARDSIZE - 2);
@@ -261,7 +274,7 @@ window.CP.exitedLoop(7);
           }
         }
       }
-window.CP.exitedLoop(8);
+window.CP.exitedLoop(9);
  //end of finding wall loop
 
       //determine length of passage to dig
@@ -275,37 +288,37 @@ window.CP.exitedLoop(8);
       try {
         switch (direction) {
           case "down":
-            for (var j = 0; j < passageLength; j++) {if (window.CP.shouldStopExecution(9)){break;}
+            for (var j = 0; j < passageLength; j++) {if (window.CP.shouldStopExecution(10)){break;}
               tempBoard[randRow][randCol + j] = true;
             }
-window.CP.exitedLoop(9);
+window.CP.exitedLoop(10);
 
             roomRow = this.randomNum(randRow - (roomWidth - 1), randRow);
             roomCol = randCol + passageLength;
             break;
           case "left":
-            for (var j = 0; j < passageLength; j++) {if (window.CP.shouldStopExecution(10)){break;}
+            for (var j = 0; j < passageLength; j++) {if (window.CP.shouldStopExecution(11)){break;}
               tempBoard[randRow - j][randCol] = true;
             }
-window.CP.exitedLoop(10);
+window.CP.exitedLoop(11);
 
             roomRow = randRow - (passageLength + (roomWidth - 1));
             roomCol = this.randomNum(randCol - roomHeight + 1, randCol);
             break;
           case "up":
-            for (var j = 0; j < passageLength; j++) {if (window.CP.shouldStopExecution(11)){break;}
+            for (var j = 0; j < passageLength; j++) {if (window.CP.shouldStopExecution(12)){break;}
               tempBoard[randRow][randCol - j] = true;
             }
-window.CP.exitedLoop(11);
+window.CP.exitedLoop(12);
 
             roomRow = this.randomNum(randRow - (roomWidth - 1), randRow);
             roomCol = randCol - passageLength - roomHeight + 1;
             break;
           case "right":
-            for (var j = 0; j < passageLength; j++) {if (window.CP.shouldStopExecution(12)){break;}
+            for (var j = 0; j < passageLength; j++) {if (window.CP.shouldStopExecution(13)){break;}
               tempBoard[randRow + j][randCol] = true;
             }
-window.CP.exitedLoop(12);
+window.CP.exitedLoop(13);
 
             roomRow = randRow + passageLength;
             roomCol = this.randomNum(randCol - roomHeight + 1, randCol);
@@ -313,20 +326,20 @@ window.CP.exitedLoop(12);
           default:
             console.log("Tried to dig passage in invalid direction");
         }
-        for (var k = roomRow; k < roomRow + roomWidth; k++) {if (window.CP.shouldStopExecution(14)){break;}
-          for (var m = roomCol; m < roomCol + roomHeight; m++) {if (window.CP.shouldStopExecution(13)){break;}
+        for (var k = roomRow; k < roomRow + roomWidth; k++) {if (window.CP.shouldStopExecution(15)){break;}
+          for (var m = roomCol; m < roomCol + roomHeight; m++) {if (window.CP.shouldStopExecution(14)){break;}
             tempBoard[k][m] = true;
           }
-window.CP.exitedLoop(13);
+window.CP.exitedLoop(14);
 
         }
-window.CP.exitedLoop(14);
+window.CP.exitedLoop(15);
 
       } catch (err) {
         console.log("Room went out of bounds");
       }
     }
-window.CP.exitedLoop(15);
+window.CP.exitedLoop(16);
  //end of room digging loop
 
     //increment level, messages
@@ -343,9 +356,9 @@ window.CP.exitedLoop(15);
     //place monsters
     var numMonsters = this.randomNum(MINITEM, MAXITEM);
     var monsterList = [];
-    for (var i = 0; i < numMonsters; i++) {if (window.CP.shouldStopExecution(17)){break;}
+    for (var i = 0; i < numMonsters; i++) {if (window.CP.shouldStopExecution(18)){break;}
       var monsterPlaced = false;
-      while (!monsterPlaced) {if (window.CP.shouldStopExecution(16)){break;}
+      while (!monsterPlaced) {if (window.CP.shouldStopExecution(17)){break;}
         var monsterCol = this.randomNum(1, BOARDSIZE - 1);
         var monsterRow = this.randomNum(1, BOARDSIZE - 1);
         if (tempBoard[monsterRow][monsterCol]) {
@@ -360,14 +373,38 @@ window.CP.exitedLoop(15);
           monsterPlaced = true;
         }
       }
-window.CP.exitedLoop(16);
+window.CP.exitedLoop(17);
 
     }
-window.CP.exitedLoop(17);
+window.CP.exitedLoop(18);
  //end of monster placement loop
 
+    //place healing items
+    var numHeals = this.randomNum(MINITEM, MAXITEM);
+    var healList = [];
+    for (var i = 0; i < numHeals; i++) {if (window.CP.shouldStopExecution(20)){break;}
+      var healPlaced = false;
+      while (!healPlaced) {if (window.CP.shouldStopExecution(19)){break;}
+        var healCol = this.randomNum(1, BOARDSIZE - 1);
+        var healRow = this.randomNum(1, BOARDSIZE - 1);
+        if (tempBoard[healRow][healCol]) {
+          healList.push({
+            col: healCol,
+            row: healRow,
+            display: true
+          });
+          healPlaced = true;
+        }
+      }
+window.CP.exitedLoop(19);
+
+    }
+window.CP.exitedLoop(20);
+
+
     //update level counter
-    //after monster placement so arrays work properly
+    //after monster/item placement so arrays work properly
+    //WEAPON[0] = no weapon
     level += 1;
 
     //place weapon
@@ -375,7 +412,7 @@ window.CP.exitedLoop(17);
     var weaponCol;
     var weaponRow;
     var weaponPlaced = false;
-    while (!weaponPlaced) {if (window.CP.shouldStopExecution(18)){break;}
+    while (!weaponPlaced) {if (window.CP.shouldStopExecution(21)){break;}
       weaponCol = this.randomNum(0, BOARDSIZE - 1);
       weaponRow = this.randomNum(0, BOARDSIZE - 1);
       if (tempBoard[weaponCol][weaponRow]) {
@@ -386,7 +423,7 @@ window.CP.exitedLoop(17);
         weaponPlaced = true;
       }
     }
-window.CP.exitedLoop(18);
+window.CP.exitedLoop(21);
 
 
     //place stairs
@@ -395,7 +432,7 @@ window.CP.exitedLoop(18);
     //do not place stairs if on the final dungeon
     if (level < 4) {
       var stairsPlaced = false;
-      while (!stairsPlaced) {if (window.CP.shouldStopExecution(19)){break;}
+      while (!stairsPlaced) {if (window.CP.shouldStopExecution(22)){break;}
         stairCol = this.randomNum(0, BOARDSIZE - 1);
         stairRow = this.randomNum(0, BOARDSIZE - 1);
         if (
@@ -414,7 +451,7 @@ window.CP.exitedLoop(18);
             stairsPlaced = true;
           }
       }
-window.CP.exitedLoop(19);
+window.CP.exitedLoop(22);
 
     } //end of stair placement
 
@@ -422,19 +459,18 @@ window.CP.exitedLoop(19);
     var playerCol;
     var playerRow;
     var playerPlaced = false;
-    while (!playerPlaced) {if (window.CP.shouldStopExecution(20)){break;}
+    while (!playerPlaced) {if (window.CP.shouldStopExecution(23)){break;}
       playerCol = this.randomNum(1, BOARDSIZE - 1);
       playerRow = this.randomNum(1, BOARDSIZE - 1);
       //ensure player is on free space
       if (
-      //add - do not spawn on top of a monster
+      //add - do not spawn on top of a monster, item?
       tempBoard[playerCol][playerRow] && playerCol !== stairCol && playerRow !== stairRow) {
         playerPlaced = true;
       }
     }
-window.CP.exitedLoop(20);
+window.CP.exitedLoop(23);
  //end of player placement
-
 
     //board complete, set state
     this.setState({
@@ -443,6 +479,7 @@ window.CP.exitedLoop(20);
       level: level,
       board: tempBoard,
       monsters: monsterList,
+      heals: healList,
       statusLog: statusLog
     });
   }, //boardSetup
@@ -479,24 +516,47 @@ window.CP.exitedLoop(20);
     }
 
     //pick up weapon
+    var statusLog = this.state.statusLog;
     var playerStats = this.state.playerStats;
     var weapon = this.state.weaponPos;
     if (playerCol === weapon.col && playerRow === weapon.row) {
       weapon.display = false;
       playerStats.weapon = WEAPONS[weapon.type];
+      statusLog.push("You picked up a " + WEAPONS[weapon.type].name + "!");
     }
+
+    //pick up heal
+    var heals = this.state.heals;
+    for (var i = 0; i < heals.length; i++) {if (window.CP.shouldStopExecution(24)){break;}
+      if (playerCol === heals[i].row && playerRow === heals[i].col && heals[i].display) {
+        //do not pick up if HP is full
+        if (playerStats.currHP >= playerStats.maxHP) {
+          statusLog.push("You found a healing potion, but your HP is already full.");
+        } else {
+          statusLog.push("You found a healing potion!");
+          heals[i].display = false;
+          playerStats.currHP += 25; //for now assume all heals are for 25HP
+          //do not allow HP to go over the max
+          if (playerStats.currHP > playerStats.maxHP) {
+            playerStats.currHP = playerStats.maxHP;
+          }
+        }
+      }
+    }
+window.CP.exitedLoop(24);
+
 
     //monster collision detection
     var monsters = this.state.monsters;
     var shouldMove = true; //don't move if bumping into a monster
-    for (var i = 0; i < monsters.length; i++) {if (window.CP.shouldStopExecution(21)){break;}
+    for (var i = 0; i < monsters.length; i++) {if (window.CP.shouldStopExecution(25)){break;}
       if (playerCol === monsters[i].row && playerRow === monsters[i].col && monsters[i].display) {
         //don't fight if monster is defeated
         shouldMove = false;
         this.fightMonster(monsters, i);
       }
     }
-window.CP.exitedLoop(21);
+window.CP.exitedLoop(25);
 
 
     //stair collision detection
@@ -511,7 +571,8 @@ window.CP.exitedLoop(21);
         this.setState({
           playerPos: { rowPos: playerRow,
             colPos: playerCol,
-            weaponPos: weapon }
+            weaponPos: weapon,
+            statusLog: statusLog }
         });
       }
     }
