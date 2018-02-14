@@ -1,19 +1,30 @@
+//board rendering parameters
 var BOARDSIZE = 45; //45
 var MAXPASSAGELENGTH = 7; //7
 var MINPASSAGELENGTH = 4; //2
 var MAXROOMSIZE = 8; //8
 var MINROOMSIZE = 3; //3
-var MAXROOMS = 13; //15
-var MINROOMS = 7; //10
+var MAXROOMS = 15; //15
+var MINROOMS = 10; //10
+//items and monsters
 var MAXITEM = 10; //# of items/monsters
 var MINITEM = 6;
-var WEAPONS = [{ name: "bare hands", strength: 0 }, { name: "pointed stick", strength: 10 }, { name: "L2 weapon", strength: 20 }, { name: "L3 weapon", strength: 30 }, { name: "sharp slice of mango", strength: 40 }];
-var MONSTERS = [{ name: "Ubiquitous Bat", HP: 50, attack: 10 }, { name: "L2 monster", HP: 70, attack: 20 }, { name: "L3 monster", HP: 90, attack: 30 }, { name: "Killer Rabbit", HP: 110, attack: 40 }];
+var WEAPONS = [{ name: "bare hands", strength: 0 }, //default when starting
+{ name: "pointed stick", strength: 10 }, { name: "dagger", strength: 20 }, { name: "really cool sword", strength: 30 }, { name: "sharp slice of mango", strength: 40 }];
+var MONSTERS = [{ name: "Ubiquitous Bat", HP: 40, attack: 10 }, { name: "Goblin", HP: 60, attack: 20 }, { name: "Cave Crocodile", HP: 80, attack: 30 }, { name: "Killer Rabbit", HP: 100, attack: 40 }, { name: "Dragon", HP: 200, attack: 80 //boss, temp stats?
+}];
 
 var Status = React.createClass({
   displayName: "Status",
 
   render: function render() {
+    var log = this.props.statusLog.map(function (item) {
+      return React.createElement(
+        "li",
+        null,
+        item
+      );
+    });
     return React.createElement(
       "div",
       { id: "status" },
@@ -47,7 +58,11 @@ var Status = React.createClass({
       React.createElement(
         "div",
         { id: "statuslog" },
-        this.props.statusLog
+        React.createElement(
+          "ul",
+          null,
+          log
+        )
       )
     );
   }
@@ -68,7 +83,7 @@ var Screen = React.createClass({
         for (var j = 0; j < this.props.board.length; j++) {if (window.CP.shouldStopExecution(1)){break;}
           ctx.beginPath();
           ctx.strokeStyle = "black";
-          ctx.fillStyle = this.props.board[i][j] ? "white" : "grey";
+          ctx.fillStyle = this.props.board[i][j] ? "tan" : "brown";
           ctx.lineWidth = 0.1;
           ctx.rect(i * 10, j * 10, 10, 10);
           ctx.fill();
@@ -79,20 +94,8 @@ window.CP.exitedLoop(1);
       }
 window.CP.exitedLoop(2);
 
-      //place monsters
-      for (var i = 0; i < this.props.monsters.length; i++) {if (window.CP.shouldStopExecution(3)){break;}
-        if (this.props.monsters[i].display) {
-          //only show undefeated monsters
-          ctx.beginPath();
-          ctx.fillStyle = "blue";
-          ctx.rect(this.props.monsters[i].row * 10, this.props.monsters[i].col * 10, 10, 10);
-          ctx.fill();
-        }
-      }
-window.CP.exitedLoop(3);
-
       //place heals
-      for (var i = 0; i < this.props.heals.length; i++) {if (window.CP.shouldStopExecution(4)){break;}
+      for (var i = 0; i < this.props.heals.length; i++) {if (window.CP.shouldStopExecution(3)){break;}
         if (this.props.heals[i].display) {
           ctx.beginPath();
           ctx.fillStyle = "purple";
@@ -100,7 +103,7 @@ window.CP.exitedLoop(3);
           ctx.fill();
         }
       }
-window.CP.exitedLoop(4);
+window.CP.exitedLoop(3);
 
       //place weapon
       if (this.props.weaponPos.display) {
@@ -119,8 +122,25 @@ window.CP.exitedLoop(4);
       ctx.fillStyle = "green";
       ctx.rect(this.props.playerPos.colPos * 10, this.props.playerPos.rowPos * 10, 10, 10);
       ctx.fill();
+      //place monsters
+      for (var i = 0; i < this.props.monsters.length; i++) {if (window.CP.shouldStopExecution(4)){break;}
+        if (this.props.monsters[i].display) {
+          //only show undefeated monsters
+          ctx.beginPath();
+          console.log(this.props.monsters[i].species);
+          ctx.fillStyle = this.props.monsters[i].species === "Dragon" ? "black" : "blue";
+          ctx.rect(this.props.monsters[i].row * 10, this.props.monsters[i].col * 10, 10, 10);
+          ctx.fill();
+        }
+      }
+window.CP.exitedLoop(4);
+
     } else {
-      //render death screen?
+      //basic death screen
+      ctx.beginPath();
+      ctx.fillStyle = "black";
+      ctx.rect(0, 0, canvas.width, canvas.height);
+      ctx.fill();
     }
   }, //componentDidUpdate
 
@@ -181,7 +201,7 @@ var App = React.createClass({
       weaponPos: { rowPos: 0, colPos: 0, type: 0, display: true },
       playerStats: {
         level: 1,
-        toNextLevel: 100,
+        toNextLevel: 50,
         maxHP: 50,
         currHP: 50,
         baseAttack: 10,
@@ -354,7 +374,7 @@ window.CP.exitedLoop(16);
     var statusLog = this.state.statusLog;
 
     if (level === 0) {
-      statusLog.push("Welcome to the dungeon! Find and kill the boss to win!");
+      statusLog.push("Welcome to the dungeon! Find and kill the dragon to win!");
     } else {
       statusLog.push("You head down the stairs...");
     }
@@ -385,6 +405,8 @@ window.CP.exitedLoop(17);
 window.CP.exitedLoop(18);
  //end of monster placement loop
 
+    //note: items etc may spawn on top of monsters. keep it that way?
+
     //place healing items
     var numHeals = this.randomNum(MINITEM, MAXITEM);
     var healList = [];
@@ -410,26 +432,50 @@ window.CP.exitedLoop(20);
 
     //update level counter
     //after monster/item placement so arrays work properly
-    //WEAPON[0] = no weapon
+    //WEAPON[0] = no weapon (aka "bare hands")
     level += 1;
+
+    //place boss monster if on final floor
+    if (level === 4) {
+      var bossCol;
+      var bossRow;
+      var bossPlaced = false;
+      while (!bossPlaced) {if (window.CP.shouldStopExecution(21)){break;}
+        bossCol = this.randomNum(0, BOARDSIZE - 1);
+        bossRow = this.randomNum(0, BOARDSIZE - 1);
+        if (tempBoard[bossRow][bossCol]) {
+          monsterList.push({
+            col: bossCol,
+            row: bossRow,
+            species: MONSTERS[4].name,
+            HP: MONSTERS[4].HP,
+            attack: MONSTERS[4].attack,
+            display: true
+          });
+          bossPlaced = true;
+        }
+      }
+window.CP.exitedLoop(21);
+
+    }
 
     //place weapon
     var weaponPos = this.state.weaponPos;
     var weaponCol;
     var weaponRow;
     var weaponPlaced = false;
-    while (!weaponPlaced) {if (window.CP.shouldStopExecution(21)){break;}
+    while (!weaponPlaced) {if (window.CP.shouldStopExecution(22)){break;}
       weaponCol = this.randomNum(0, BOARDSIZE - 1);
       weaponRow = this.randomNum(0, BOARDSIZE - 1);
       if (tempBoard[weaponCol][weaponRow]) {
         weaponPos.col = weaponCol;
         weaponPos.row = weaponRow;
-        weaponPos.type += 1; //get the next one in the list, fix for top weapon later
+        weaponPos.type += 1; //get the next one in the list
         weaponPos.display = true; //weapon is visible and can be collected
         weaponPlaced = true;
       }
     }
-window.CP.exitedLoop(21);
+window.CP.exitedLoop(22);
 
 
     //place stairs
@@ -438,12 +484,12 @@ window.CP.exitedLoop(21);
     //do not place stairs if on the final dungeon
     if (level < 4) {
       var stairsPlaced = false;
-      while (!stairsPlaced) {if (window.CP.shouldStopExecution(22)){break;}
+      while (!stairsPlaced) {if (window.CP.shouldStopExecution(23)){break;}
         stairCol = this.randomNum(0, BOARDSIZE - 1);
         stairRow = this.randomNum(0, BOARDSIZE - 1);
         if (
         //checking for clear space
-        //add - do not spawn on top of a monster
+        //add - do not spawn on top of the weapon!
         tempBoard[stairCol][stairRow] && //centre
         tempBoard[stairCol - 1][stairRow - 1] && //top left
         tempBoard[stairCol][stairRow - 1] && //top middle
@@ -457,7 +503,7 @@ window.CP.exitedLoop(21);
             stairsPlaced = true;
           }
       }
-window.CP.exitedLoop(22);
+window.CP.exitedLoop(23);
 
     } //end of stair placement
 
@@ -465,17 +511,17 @@ window.CP.exitedLoop(22);
     var playerCol;
     var playerRow;
     var playerPlaced = false;
-    while (!playerPlaced) {if (window.CP.shouldStopExecution(23)){break;}
+    while (!playerPlaced) {if (window.CP.shouldStopExecution(24)){break;}
       playerCol = this.randomNum(1, BOARDSIZE - 1);
       playerRow = this.randomNum(1, BOARDSIZE - 1);
       //ensure player is on free space
       if (
-      //add - do not spawn on top of a monster, item?
+      //add - do not spawn on top of the weapon
       tempBoard[playerCol][playerRow] && playerCol !== stairCol && playerRow !== stairRow) {
         playerPlaced = true;
       }
     }
-window.CP.exitedLoop(23);
+window.CP.exitedLoop(24);
  //end of player placement
 
     //board complete, set state
@@ -525,7 +571,7 @@ window.CP.exitedLoop(23);
     var statusLog = this.state.statusLog;
     var playerStats = this.state.playerStats;
     var weapon = this.state.weaponPos;
-    if (playerCol === weapon.col && playerRow === weapon.row) {
+    if (playerCol === weapon.col && playerRow === weapon.row && weapon.display) {
       weapon.display = false;
       playerStats.weapon = WEAPONS[weapon.type];
       statusLog.push("You picked up a " + WEAPONS[weapon.type].name + "!");
@@ -533,7 +579,7 @@ window.CP.exitedLoop(23);
 
     //pick up heal
     var heals = this.state.heals;
-    for (var i = 0; i < heals.length; i++) {if (window.CP.shouldStopExecution(24)){break;}
+    for (var i = 0; i < heals.length; i++) {if (window.CP.shouldStopExecution(25)){break;}
       if (playerCol === heals[i].row && playerRow === heals[i].col && heals[i].display) {
         //do not pick up if HP is full
         if (playerStats.currHP >= playerStats.maxHP) {
@@ -541,7 +587,8 @@ window.CP.exitedLoop(23);
         } else {
           statusLog.push("You found a healing potion!");
           heals[i].display = false;
-          playerStats.currHP += 25; //for now assume all heals are for 25HP
+          //amount healed is dependent on the dungeon floor
+          playerStats.currHP += 25 + (this.state.level - 1) * 10;
           //do not allow HP to go over the max
           if (playerStats.currHP > playerStats.maxHP) {
             playerStats.currHP = playerStats.maxHP;
@@ -549,20 +596,20 @@ window.CP.exitedLoop(23);
         }
       }
     }
-window.CP.exitedLoop(24);
+window.CP.exitedLoop(25);
 
 
     //monster collision detection
     var monsters = this.state.monsters;
     var shouldMove = true; //don't move if bumping into a monster
-    for (var i = 0; i < monsters.length; i++) {if (window.CP.shouldStopExecution(25)){break;}
-      if (playerCol === monsters[i].row && playerRow === monsters[i].col && monsters[i].display) {
-        //don't fight if monster is defeated
-        shouldMove = false;
-        this.fightMonster(monsters, i);
-      }
+    for (var i = 0; i < monsters.length; i++) {if (window.CP.shouldStopExecution(26)){break;}
+      if (playerCol === monsters[i].row && playerRow === monsters[i].col && monsters[i].display //don't fight if monster is defeated
+      ) {
+          shouldMove = false;
+          this.fightMonster(monsters, i);
+        }
     }
-window.CP.exitedLoop(25);
+window.CP.exitedLoop(26);
 
 
     //stair collision detection
@@ -590,11 +637,15 @@ window.CP.exitedLoop(25);
     //get status log
     var statusLog = this.state.statusLog;
     var playerStats = this.state.playerStats;
+    //is this a boss fight?
+    var isBoss = monsters[index].species === "Dragon" ? true : false;
     //open combat message
-    statusLog.push("You are attacked by a " + monsters[index].species + " with " + monsters[index].HP + " HP!");
-    //console.log(monsters[index]);
+    if (isBoss) {
+      statusLog.push("You have encountered the Dragon!");
+    } else {
+      statusLog.push("You are attacked by a " + monsters[index].species + " with " + monsters[index].HP + " HP!");
+    }
     //player attacks
-    //base attack increases with level
     var playerAttack = playerStats.baseAttack + playerStats.weapon.strength;
     var playerDamage = this.randomNum(Math.round(playerAttack - playerAttack / 2), Math.round(playerAttack + playerAttack / 2));
     statusLog.push("You hit the " + monsters[index].species + " for " + playerDamage + "!");
@@ -603,15 +654,21 @@ window.CP.exitedLoop(25);
     //did we defeat it?
     if (monsters[index].HP <= 0) {
       monsters[index].display = false;
-      statusLog.push("You defeated the " + monsters[index].species + "!");
-      //gain exp - temp using monster's attack stat as exp gain?
-      playerStats.toNextLevel -= monsters[index].attack;
-      //did we level up?
-      if (playerStats.toNextLevel <= 0) {
-        statusLog.push("You levelled up!");
-        playerStats.level += 1;
-        playerStats.toNextLevel = playerStats.level * 100;
-        playerStats.maxHP += 20;
+      if (isBoss) {
+        statusLog.push("You have defeated the dragon and beaten the dungeon! Congratulations!");
+        //end here and do some sort of win routine
+      } else {
+        statusLog.push("You defeated the " + monsters[index].species + "!");
+        //gain exp based off monster's attack stat
+        playerStats.toNextLevel -= monsters[index].attack;
+        //did we level up?
+        if (playerStats.toNextLevel <= 0) {
+          statusLog.push("You levelled up!");
+          playerStats.level += 1;
+          playerStats.toNextLevel = playerStats.level * 50;
+          playerStats.maxHP += 20;
+          playerStats.attack += 10;
+        }
       }
     } else {
       //if we did not defeat it, the monster attacks us next
