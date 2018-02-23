@@ -1,29 +1,38 @@
 #main {
-  border:1px solid red;
-  #status {
-    border:1px solid blue;
-    /*width:19%;
-    float:left;*/
-    #statuslog {
-      border: 1px solid orange;
-      height: 200px;
-      overflow: scroll;
-    }
-  }
-  #screen {
-    border: 1px solid green;
-    width: 61%;
-    /*float:left;*/
-    #gridCanvas {
-      border: 10px solid brown;
-      display: block;
-      margin:auto;
-    }
-  }
-  #controls {
-    border: 1px solid purple;
-    /*width:19%;
-    float:left;
-    */
-  }
+  border: 1px solid red;
+}
+#main #status {
+  border: 1px solid blue;
+  /*width:19%;
+  float:left;*/
+}
+#main #status #statuslog {
+  border: 1px solid orange;
+  height: 200px;
+  overflow: scroll;
+}
+#main #screen {
+  border: 1px solid green;
+  width: 61%;
+  /*float:left;*/
+}
+#main #screen #gridCanvas {
+  border: 10px solid brown;
+  display: block;
+  margin: auto;
+}
+#main #controls {
+  border: 1px solid purple;
+  /*width:19%;
+  float:left;
+  */
+}
+#main #stairmessage {
+  width: 300px;
+  background-color: skyblue;
+  position: fixed;
+  z-index: 10;
+  left: 50%;
+  top: 400px;
+  margin: 0 0 0 -151px;
 }
