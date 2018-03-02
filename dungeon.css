@@ -27,7 +27,7 @@
   float:left;
   */
 }
-#main #stairmessage {
+#main #stairmessage, #main #winmessage, #main #deathmessage {
   width: 300px;
   background-color: skyblue;
   position: fixed;
