@@ -17,7 +17,7 @@
   /*float:left;*/
 }
 #main #screen #gridCanvas {
-  border: 10px solid brown;
+  border: 20px solid brown;
   display: block;
   margin: auto;
 }
