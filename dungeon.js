@@ -190,46 +190,6 @@ var Screen = React.createClass({
   displayName: "Screen",
 
   componentDidUpdate: function componentDidUpdate() {
-    function loadImages(sources, callback) {
-      var images = {};
-      var loadedImages = 0;
-      var numImages = 0;
-      // get num of sources
-      for (var src in sources) {if (window.CP.shouldStopExecution(1)){break;}
-        numImages++;
-      }
-window.CP.exitedLoop(1);
-
-      for (var src in sources) {if (window.CP.shouldStopExecution(2)){break;}
-        images[src] = new Image();
-        images[src].onload = function () {
-          if (++loadedImages >= numImages) {
-            callback(images);
-          }
-        };
-        images[src].src = sources[src];
-      }
-window.CP.exitedLoop(2);
-
-    }
-
-    var sources = {
-      closed: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_closed.png",
-      open: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_open.png",
-      player: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_p.png",
-      heal: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_h.png",
-      weapon1: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_w1.png",
-      weapon2: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_w2.png",
-      weapon3: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_w3.png",
-      weapon4: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_w4.png",
-      stair: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_s.png",
-      monster1: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_m1.png",
-      monster2: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_m2.png",
-      monster3: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_m3.png",
-      monster4: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_m4.png",
-      dragon: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_d.png"
-    };
-
     var canvas = ReactDOM.findDOMNode(this.refs.gridCanvas);
     canvas.width = BOARDSIZE * 10;
     canvas.height = BOARDSIZE * 10;
@@ -239,112 +199,103 @@ window.CP.exitedLoop(2);
       //get starting position to draw from
       var colStart = this.props.playerPos.colPos - 10;
       var rowStart = this.props.playerPos.rowPos - 10;
-      //get arrays etc
-      var board = this.props.board;
-      var healList = this.props.heals;
-      var level = this.props.level;
-      var weaponPos = this.props.weaponPos;
-      var stairPos = this.props.stairPos;
-      var monsterList = this.props.monsters;
-      //load images and draw
-      loadImages(sources, function (images) {
-        var closed = ctx.createPattern(images.closed, "repeat");
-        ctx.beginPath();
-        ctx.fillStyle = closed;
-        ctx.rect(0, 0, canvas.width, canvas.height);
-        ctx.fill();
-        //draw the board
-        var openImg = new Image();
-        var open = ctx.createPattern(images.open, "repeat");
-        for (var i = 0; i < BOARDSIZE; i++) {if (window.CP.shouldStopExecution(4)){break;}
-          for (var j = 0; j < BOARDSIZE; j++) {if (window.CP.shouldStopExecution(3)){break;}
-            if (colStart + i < BOARDSIZE && rowStart + j < BOARDSIZE && colStart + i > 0 && rowStart + j > 0) {
-              ctx.beginPath();
-              ctx.fillStyle = board[colStart + i][rowStart + j] ? open : "transparent";
-              ctx.rect(i * 20, j * 20, 20, 20);
-              ctx.fill();
-            }
-          }
-window.CP.exitedLoop(3);
-
-        }
-window.CP.exitedLoop(4);
-
-        var player = ctx.createPattern(images.player, "repeat");
-        ctx.beginPath();
-        ctx.fillStyle = player;
-        ctx.rect(200, 200, 20, 20);
-        ctx.fill();
-        //place heals
-        var heal = ctx.createPattern(images.heal, "repeat");
-        for (var i = 0; i < healList.length; i++) {if (window.CP.shouldStopExecution(5)){break;}
-          if (healList[i].display) {
+      //draw background
+      var closed = ctx.createPattern(this.props.patterns.closed, "repeat");
+      ctx.beginPath();
+      ctx.fillStyle = closed;
+      ctx.rect(0, 0, canvas.width, canvas.height);
+      ctx.fill();
+      //draw the board
+      var open = ctx.createPattern(this.props.patterns.open, "repeat");
+      for (var i = 0; i < BOARDSIZE; i++) {if (window.CP.shouldStopExecution(2)){break;}
+        for (var j = 0; j < BOARDSIZE; j++) {if (window.CP.shouldStopExecution(1)){break;}
+          if (colStart + i < BOARDSIZE && rowStart + j < BOARDSIZE && colStart + i > 0 && rowStart + j > 0) {
             ctx.beginPath();
-            ctx.fillStyle = heal;
-            ctx.rect((healList[i].row - colStart) * 20, (healList[i].col - rowStart) * 20, 20, 20);
+            ctx.fillStyle = this.props.board[colStart + i][rowStart + j] ? open : "transparent";
+            ctx.rect(i * 20, j * 20, 20, 20);
             ctx.fill();
           }
         }
-window.CP.exitedLoop(5);
+window.CP.exitedLoop(1);
 
-        //place weapon
-        var weapon;
-        //exact image depends on what level we are on
-        switch (level) {
-          case 1:
-            weapon = ctx.createPattern(images.weapon1, "repeat");
-            break;
-          case 2:
-            weapon = ctx.createPattern(images.weapon2, "repeat");
-            break;
-          case 3:
-            weapon = ctx.createPattern(images.weapon3, "repeat");
-            break;
-          case 4:
-            weapon = ctx.createPattern(images.weapon4, "repeat");
-            break;
-        }
-        if (weaponPos.display) {
+      }
+window.CP.exitedLoop(2);
+
+      //draw player
+      var player = ctx.createPattern(this.props.patterns.player, "repeat");
+      ctx.beginPath();
+      ctx.fillStyle = player;
+      ctx.rect(200, 200, 20, 20);
+      ctx.fill();
+      //place heals
+      var heal = ctx.createPattern(this.props.patterns.heal, "repeat");
+      for (var i = 0; i < this.props.heals.length; i++) {if (window.CP.shouldStopExecution(3)){break;}
+        if (this.props.heals[i].display) {
           ctx.beginPath();
-          ctx.fillStyle = weapon;
-          ctx.rect((weaponPos.col - colStart) * 20, (weaponPos.row - rowStart) * 20, 20, 20);
+          ctx.fillStyle = heal;
+          ctx.rect((this.props.heals[i].row - colStart) * 20, (this.props.heals[i].col - rowStart) * 20, 20, 20);
           ctx.fill();
         }
-        //place stairs
-        var stair = ctx.createPattern(images.stair, "repeat");
-        ctx.beginPath();
-        ctx.fillStyle = stair;
-        ctx.rect((stairPos.colPos - colStart) * 20, (stairPos.rowPos - rowStart) * 20, 20, 20);
-        ctx.fill();
-        //place monsters
-        var monster;
-        //as with the weapon the monster is dependent on level
-        switch (level) {
-          case 1:
-            monster = ctx.createPattern(images.monster1, "repeat");
-            break;
-          case 2:
-            monster = ctx.createPattern(images.monster2, "repeat");
-            break;
-          case 3:
-            monster = ctx.createPattern(images.monster3, "repeat");
-            break;
-          case 4:
-            monster = ctx.createPattern(images.monster4, "repeat");
-            break;
-        }
-        var dragon = ctx.createPattern(images.dragon, "repeat");
-        for (var i = 0; i < monsterList.length; i++) {if (window.CP.shouldStopExecution(6)){break;}
-          if (monsterList[i].display) {
-            ctx.beginPath();
-            ctx.fillStyle = monsterList[i].species === "Dragon" ? dragon : monster;
-            ctx.rect((monsterList[i].row - colStart) * 20, (monsterList[i].col - rowStart) * 20, 20, 20);
-            ctx.fill();
-          }
-        }
-window.CP.exitedLoop(6);
+      }
+window.CP.exitedLoop(3);
 
-      });
+      //place weapon
+      var weapon;
+      //exact image depends on what level we are on
+      switch (this.props.level) {
+        case 1:
+          weapon = ctx.createPattern(this.props.patterns.weapon1, "repeat");
+          break;
+        case 2:
+          weapon = ctx.createPattern(this.props.patterns.weapon2, "repeat");
+          break;
+        case 3:
+          weapon = ctx.createPattern(this.props.patterns.weapon3, "repeat");
+          break;
+        case 4:
+          weapon = ctx.createPattern(this.props.patterns.weapon4, "repeat");
+          break;
+      }
+      if (this.props.weaponPos.display) {
+        ctx.beginPath();
+        ctx.fillStyle = weapon;
+        ctx.rect((this.props.weaponPos.col - colStart) * 20, (this.props.weaponPos.row - rowStart) * 20, 20, 20);
+        ctx.fill();
+      }
+      //place stairs
+      var stair = ctx.createPattern(this.props.patterns.stair, "repeat");
+      ctx.beginPath();
+      ctx.fillStyle = stair;
+      ctx.rect((this.props.stairPos.colPos - colStart) * 20, (this.props.stairPos.rowPos - rowStart) * 20, 20, 20);
+      ctx.fill();
+      //place monsters
+      var monster;
+      //as with the weapon the monster is dependent on level
+      switch (this.props.level) {
+        case 1:
+          monster = ctx.createPattern(this.props.patterns.monster1, "repeat");
+          break;
+        case 2:
+          monster = ctx.createPattern(this.props.patterns.monster2, "repeat");
+          break;
+        case 3:
+          monster = ctx.createPattern(this.props.patterns.monster3, "repeat");
+          break;
+        case 4:
+          monster = ctx.createPattern(this.props.patterns.monster4, "repeat");
+          break;
+      }
+      var dragon = ctx.createPattern(this.props.patterns.dragon, "repeat");
+      for (var i = 0; i < this.props.monsters.length; i++) {if (window.CP.shouldStopExecution(4)){break;}
+        if (this.props.monsters[i].display) {
+          ctx.beginPath();
+          ctx.fillStyle = this.props.monsters[i].species === "Dragon" ? dragon : monster;
+          ctx.rect((this.props.monsters[i].row - colStart) * 20, (this.props.monsters[i].col - rowStart) * 20, 20, 20);
+          ctx.fill();
+        }
+      }
+window.CP.exitedLoop(4);
+
     } else {
       //basic death screen, make fancier later?
       ctx.beginPath();
@@ -403,7 +354,7 @@ var Controls = React.createClass({
     e.preventDefault();
     //don't move if game is over
     if (!this.props.isDead && !this.props.isWinner) {
-      this.props.moveChar(event.target.id);
+      this.props.moveChar(e.target.id);
     }
   } //handleMove
 }); //Controls
@@ -431,12 +382,14 @@ var App = React.createClass({
       statusLog: [],
       displayStairMessage: false,
       displayWinScreen: false,
-      displayDeathScreen: false
+      displayDeathScreen: false,
+      patterns: {}
     };
   }, //getInitialState
 
   componentDidMount: function componentDidMount() {
     this.boardSetup();
+    this.imageLoader();
   }, //componentDidMount
 
   render: function render() {
@@ -468,7 +421,8 @@ var App = React.createClass({
         weaponPos: this.state.weaponPos,
         monsters: this.state.monsters,
         heals: this.state.heals,
-        level: this.state.level
+        level: this.state.level,
+        patterns: this.state.patterns
       }),
       React.createElement(Controls, {
         moveChar: this.moveChar,
@@ -483,16 +437,16 @@ var App = React.createClass({
     var level = this.state.level;
     //create new blank board
     var tempBoard = [];
-    for (var i = 0; i < BOARDSIZE; i++) {if (window.CP.shouldStopExecution(8)){break;}
+    for (var i = 0; i < BOARDSIZE; i++) {if (window.CP.shouldStopExecution(6)){break;}
       var col = [];
-      for (var j = 0; j < BOARDSIZE; j++) {if (window.CP.shouldStopExecution(7)){break;}
+      for (var j = 0; j < BOARDSIZE; j++) {if (window.CP.shouldStopExecution(5)){break;}
         col.push(false);
       }
-window.CP.exitedLoop(7);
+window.CP.exitedLoop(5);
 
       tempBoard.push(col);
     }
-window.CP.exitedLoop(8);
+window.CP.exitedLoop(6);
 
 
     //dig starter room
@@ -500,23 +454,23 @@ window.CP.exitedLoop(8);
     var startCol = this.randomNum(10, BOARDSIZE - 10);
     var startHeight = this.randomNum(MAXROOMSIZE, MINROOMSIZE);
     var startWidth = this.randomNum(MAXROOMSIZE, MINROOMSIZE);
-    for (var i = startRow; i < startRow + startWidth; i++) {if (window.CP.shouldStopExecution(10)){break;}
-      for (var j = startCol; j < startCol + startHeight; j++) {if (window.CP.shouldStopExecution(9)){break;}
+    for (var i = startRow; i < startRow + startWidth; i++) {if (window.CP.shouldStopExecution(8)){break;}
+      for (var j = startCol; j < startCol + startHeight; j++) {if (window.CP.shouldStopExecution(7)){break;}
         tempBoard[i][j] = true;
       }
-window.CP.exitedLoop(9);
+window.CP.exitedLoop(7);
 
     }
-window.CP.exitedLoop(10);
+window.CP.exitedLoop(8);
 
 
     //get number of remaining rooms to dig...
     var numRooms = this.randomNum(MINROOMS, MAXROOMS);
     //..and dig them
-    for (var i = 0; i < numRooms; i++) {if (window.CP.shouldStopExecution(18)){break;}
+    for (var i = 0; i < numRooms; i++) {if (window.CP.shouldStopExecution(16)){break;}
       //get wall tile next to clear tile to dig from
       var wallFound = false;
-      while (!wallFound) {if (window.CP.shouldStopExecution(11)){break;}
+      while (!wallFound) {if (window.CP.shouldStopExecution(9)){break;}
         //pick random tile
         var randCol = this.randomNum(1, BOARDSIZE - 2);
         var randRow = this.randomNum(1, BOARDSIZE - 2);
@@ -539,7 +493,7 @@ window.CP.exitedLoop(10);
           }
         }
       }
-window.CP.exitedLoop(11);
+window.CP.exitedLoop(9);
  //end of finding wall loop
 
       //determine length of passage to dig
@@ -553,37 +507,37 @@ window.CP.exitedLoop(11);
       try {
         switch (direction) {
           case "down":
-            for (var j = 0; j < passageLength; j++) {if (window.CP.shouldStopExecution(12)){break;}
+            for (var j = 0; j < passageLength; j++) {if (window.CP.shouldStopExecution(10)){break;}
               tempBoard[randRow][randCol + j] = true;
             }
-window.CP.exitedLoop(12);
+window.CP.exitedLoop(10);
 
             roomRow = this.randomNum(randRow - (roomWidth - 1), randRow);
             roomCol = randCol + passageLength;
             break;
           case "left":
-            for (var j = 0; j < passageLength; j++) {if (window.CP.shouldStopExecution(13)){break;}
+            for (var j = 0; j < passageLength; j++) {if (window.CP.shouldStopExecution(11)){break;}
               tempBoard[randRow - j][randCol] = true;
             }
-window.CP.exitedLoop(13);
+window.CP.exitedLoop(11);
 
             roomRow = randRow - (passageLength + (roomWidth - 1));
             roomCol = this.randomNum(randCol - roomHeight + 1, randCol);
             break;
           case "up":
-            for (var j = 0; j < passageLength; j++) {if (window.CP.shouldStopExecution(14)){break;}
+            for (var j = 0; j < passageLength; j++) {if (window.CP.shouldStopExecution(12)){break;}
               tempBoard[randRow][randCol - j] = true;
             }
-window.CP.exitedLoop(14);
+window.CP.exitedLoop(12);
 
             roomRow = this.randomNum(randRow - (roomWidth - 1), randRow);
             roomCol = randCol - passageLength - roomHeight + 1;
             break;
           case "right":
-            for (var j = 0; j < passageLength; j++) {if (window.CP.shouldStopExecution(15)){break;}
+            for (var j = 0; j < passageLength; j++) {if (window.CP.shouldStopExecution(13)){break;}
               tempBoard[randRow + j][randCol] = true;
             }
-window.CP.exitedLoop(15);
+window.CP.exitedLoop(13);
 
             roomRow = randRow + passageLength;
             roomCol = this.randomNum(randCol - roomHeight + 1, randCol);
@@ -591,20 +545,20 @@ window.CP.exitedLoop(15);
           default:
             console.log("Tried to dig passage in invalid direction");
         }
-        for (var k = roomRow; k < roomRow + roomWidth; k++) {if (window.CP.shouldStopExecution(17)){break;}
-          for (var m = roomCol; m < roomCol + roomHeight; m++) {if (window.CP.shouldStopExecution(16)){break;}
+        for (var k = roomRow; k < roomRow + roomWidth; k++) {if (window.CP.shouldStopExecution(15)){break;}
+          for (var m = roomCol; m < roomCol + roomHeight; m++) {if (window.CP.shouldStopExecution(14)){break;}
             tempBoard[k][m] = true;
           }
-window.CP.exitedLoop(16);
+window.CP.exitedLoop(14);
 
         }
-window.CP.exitedLoop(17);
+window.CP.exitedLoop(15);
 
       } catch (err) {
         console.log("Room went out of bounds");
       }
     }
-window.CP.exitedLoop(18);
+window.CP.exitedLoop(16);
  //end of room digging loop
 
     //increment level, messages
@@ -621,9 +575,9 @@ window.CP.exitedLoop(18);
     //place monsters
     var numMonsters = this.randomNum(MINITEM, MAXITEM);
     var monsterList = [];
-    for (var i = 0; i < numMonsters; i++) {if (window.CP.shouldStopExecution(20)){break;}
+    for (var i = 0; i < numMonsters; i++) {if (window.CP.shouldStopExecution(18)){break;}
       var monsterPlaced = false;
-      while (!monsterPlaced) {if (window.CP.shouldStopExecution(19)){break;}
+      while (!monsterPlaced) {if (window.CP.shouldStopExecution(17)){break;}
         var monsterCol = this.randomNum(1, BOARDSIZE - 1);
         var monsterRow = this.randomNum(1, BOARDSIZE - 1);
         if (tempBoard[monsterRow][monsterCol]) {
@@ -638,10 +592,10 @@ window.CP.exitedLoop(18);
           monsterPlaced = true;
         }
       }
-window.CP.exitedLoop(19);
+window.CP.exitedLoop(17);
 
     }
-window.CP.exitedLoop(20);
+window.CP.exitedLoop(18);
  //end of monster placement loop
 
     //note: items etc may spawn on top of monsters. keep it that way?
@@ -649,9 +603,9 @@ window.CP.exitedLoop(20);
     //place healing items
     var numHeals = this.randomNum(MINITEM, MAXITEM);
     var healList = [];
-    for (var i = 0; i < numHeals; i++) {if (window.CP.shouldStopExecution(22)){break;}
+    for (var i = 0; i < numHeals; i++) {if (window.CP.shouldStopExecution(20)){break;}
       var healPlaced = false;
-      while (!healPlaced) {if (window.CP.shouldStopExecution(21)){break;}
+      while (!healPlaced) {if (window.CP.shouldStopExecution(19)){break;}
         var healCol = this.randomNum(1, BOARDSIZE - 1);
         var healRow = this.randomNum(1, BOARDSIZE - 1);
         if (tempBoard[healRow][healCol]) {
@@ -663,10 +617,10 @@ window.CP.exitedLoop(20);
           healPlaced = true;
         }
       }
-window.CP.exitedLoop(21);
+window.CP.exitedLoop(19);
 
     }
-window.CP.exitedLoop(22);
+window.CP.exitedLoop(20);
 
 
     //update level counter
@@ -679,7 +633,7 @@ window.CP.exitedLoop(22);
       var bossCol;
       var bossRow;
       var bossPlaced = false;
-      while (!bossPlaced) {if (window.CP.shouldStopExecution(23)){break;}
+      while (!bossPlaced) {if (window.CP.shouldStopExecution(21)){break;}
         bossCol = this.randomNum(0, BOARDSIZE - 1);
         bossRow = this.randomNum(0, BOARDSIZE - 1);
         if (tempBoard[bossRow][bossCol]) {
@@ -694,7 +648,7 @@ window.CP.exitedLoop(22);
           bossPlaced = true;
         }
       }
-window.CP.exitedLoop(23);
+window.CP.exitedLoop(21);
 
     }
 
@@ -703,7 +657,7 @@ window.CP.exitedLoop(23);
     var weaponCol;
     var weaponRow;
     var weaponPlaced = false;
-    while (!weaponPlaced) {if (window.CP.shouldStopExecution(24)){break;}
+    while (!weaponPlaced) {if (window.CP.shouldStopExecution(22)){break;}
       weaponCol = this.randomNum(0, BOARDSIZE - 1);
       weaponRow = this.randomNum(0, BOARDSIZE - 1);
       if (tempBoard[weaponCol][weaponRow]) {
@@ -714,7 +668,7 @@ window.CP.exitedLoop(23);
         weaponPlaced = true;
       }
     }
-window.CP.exitedLoop(24);
+window.CP.exitedLoop(22);
 
 
     //place stairs
@@ -723,7 +677,7 @@ window.CP.exitedLoop(24);
     //do not place stairs if on the final dungeon
     if (level < 4) {
       var stairsPlaced = false;
-      while (!stairsPlaced) {if (window.CP.shouldStopExecution(25)){break;}
+      while (!stairsPlaced) {if (window.CP.shouldStopExecution(23)){break;}
         stairCol = this.randomNum(1, BOARDSIZE - 1);
         stairRow = this.randomNum(1, BOARDSIZE - 1);
         if (
@@ -741,7 +695,7 @@ window.CP.exitedLoop(24);
             stairsPlaced = true;
           }
       }
-window.CP.exitedLoop(25);
+window.CP.exitedLoop(23);
 
     } //end of stair placement
 
@@ -749,7 +703,7 @@ window.CP.exitedLoop(25);
     var playerCol;
     var playerRow;
     var playerPlaced = false;
-    while (!playerPlaced) {if (window.CP.shouldStopExecution(26)){break;}
+    while (!playerPlaced) {if (window.CP.shouldStopExecution(24)){break;}
       playerCol = this.randomNum(1, BOARDSIZE - 1);
       playerRow = this.randomNum(1, BOARDSIZE - 1);
       //ensure player is on free space
@@ -759,7 +713,7 @@ window.CP.exitedLoop(25);
         playerPlaced = true;
       }
     }
-window.CP.exitedLoop(26);
+window.CP.exitedLoop(24);
  //end of player placement
 
     //board complete, set state
@@ -773,6 +727,67 @@ window.CP.exitedLoop(26);
       statusLog: statusLog
     });
   }, //boardSetup
+
+  imageLoader: function imageLoader() {
+    //load images on startup
+    function loadImages(sources, callback) {
+      var images = {};
+      var loadedImages = 0;
+      var numImages = 0;
+      // get num of sources
+      for (var src in sources) {if (window.CP.shouldStopExecution(25)){break;}
+        numImages++;
+      }
+window.CP.exitedLoop(25);
+
+      for (var src in sources) {if (window.CP.shouldStopExecution(26)){break;}
+        images[src] = new Image();
+        images[src].onload = function () {
+          if (++loadedImages >= numImages) {
+            callback(images);
+          }
+        };
+        images[src].src = sources[src];
+      }
+window.CP.exitedLoop(26);
+
+    }
+    var sources = {
+      closed: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_closed.png",
+      open: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_open.png",
+      player: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_p.png",
+      heal: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_h.png",
+      weapon1: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_w1.png",
+      weapon2: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_w2.png",
+      weapon3: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_w3.png",
+      weapon4: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_w4.png",
+      stair: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_s.png",
+      monster1: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_m1.png",
+      monster2: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_m2.png",
+      monster3: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_m3.png",
+      monster4: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_m4.png",
+      dragon: "https://raw.githubusercontent.com/J-Sanderson/ReactJS-Roguelike-Dungeon-Crawler/master/tile_d.png"
+    };
+    loadImages(sources, function (images) {
+      var patterns = {
+        closed: images.closed,
+        open: images.open,
+        player: images.player,
+        heal: images.heal,
+        weapon1: images.weapon1,
+        weapon2: images.weapon2,
+        weapon3: images.weapon3,
+        weapon4: images.weapon4,
+        stair: images.stair,
+        monster1: images.monster1,
+        monster2: images.monster2,
+        monster3: images.monster3,
+        monster4: images.monster4,
+        dragon: images.dragon
+      };
+      this.setState({ patterns: patterns });
+    }.bind(this));
+  }, //imageLoader
 
   moveChar: function moveChar(dir) {
     //get current player loc from state
