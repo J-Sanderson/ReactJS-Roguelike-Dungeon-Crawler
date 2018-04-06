@@ -1,38 +1,115 @@
+/*http://paletton.com/#uid=10k0u0kllllaFw0g0qFqFg0w0aF*/
+body {
+  background: #551e00;
+  background-image: url("http://www.commentnation.com/backgrounds/images/stone_tile_background_dark_brown_seamless.jpg");
+  font-family: "Courier New", monospace;
+  color: #551e00;
+}
+
 #main {
-  border: 1px solid red;
+  background: #d48f6a;
+  background-image: url("http://1.bp.blogspot.com/-nv1J7PXd0eY/U4NXMiBOFKI/AAAAAAAAO94/oe2WJwHpomM/s1600/Kraft_Dirty_Paper_Texture.jpg");
+  background-position: center center;
+  height: 580px;
+  width: 897px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  padding: 20px;
+  box-shadow: 0px 0px 40px black, inset 0px 0px 30px #551e00;
+  text-align: center;
+}
+#main h1 {
+  font-family: "Germania One", cursive;
+  font-size: 60px;
+  margin: 0px;
+  text-shadow: 0px 0px 10px #d46c6a;
 }
 #main #status {
-  border: 1px solid blue;
-  /*width:19%;
-  float:left;*/
+  width: 250px;
+  height: 500px;
+  float: left;
+  text-shadow: 1px 1px 0px #ebcbb9;
 }
 #main #status #statuslog {
-  border: 1px solid orange;
-  height: 200px;
-  overflow: scroll;
+  text-shadow: none;
+  background: #ebcbb9;
+  background-image: url("http://inspirationhut.net/wp-content/uploads/2012/11/Grungy-Paper-Texture-3.jpg");
+  background-position: center center;
+  box-shadow: inset 0px 0px 30px #551e00, 0px 5px 10px #551e00;
+  margin: 0px 10px;
+  height: 335px;
+  overflow: auto;
+}
+#main #status #statuslog ul {
+  margin: 0px;
+  padding: 5px;
+  list-style-type: none;
+}
+#main #status #statuslog ul li {
+  margin: 5px 0px;
 }
 #main #screen {
-  border: 1px solid green;
-  width: 61%;
-  /*float:left;*/
+  width: 490px;
+  height: 500px;
+  padding-top: 15px;
+  float: left;
 }
 #main #screen #gridCanvas {
-  border: 20px solid brown;
+  border: 15px solid #551e00;
   display: block;
   margin: auto;
 }
 #main #controls {
-  border: 1px solid purple;
-  /*width:19%;
-  float:left;
-  */
+  width: 150px;
+  height: 500px;
+  float: left;
 }
-#main #stairmessage, #main #winmessage, #main #deathmessage {
+#main #controls #buttonbox {
+  margin-top: 170px;
+}
+#main #controls #buttonbox button {
+  font-family: "Courier New", monospace;
+  font-size: 30px;
+  border: none;
+  margin: 3px;
+  background-color: #803a15;
+  color: #ebcbb9;
+  font-weight: bold;
+  box-shadow: 2px 2px 2px #551e00, inset 2px 2px 5px #d48f6a;
+  padding: 6px 14px;
+}
+#main #controls #buttonbox button:active {
+  box-shadow: inset 2px 2px 5px #d48f6a;
+}
+#main #controls #buttonbox button:focus {
+  outline: 0;
+}
+#main #stairmessage,
+#main #winmessage,
+#main #deathmessage {
   width: 300px;
-  background-color: skyblue;
+  background: #ebcbb9;
+  background-image: url("http://inspirationhut.net/wp-content/uploads/2012/11/Grungy-Paper-Texture-3.jpg");
+  background-position: center center;
+  box-shadow: inset 0px 0px 30px #551e00, 0px 0px 20px black;
+  font-weight: bold;
   position: fixed;
   z-index: 10;
   left: 50%;
-  top: 400px;
+  top: 300px;
   margin: 0 0 0 -151px;
+  padding-bottom: 10px;
+}
+#main #stairmessage button,
+#main #winmessage button,
+#main #deathmessage button {
+  font-family: "Courier New", monospace;
+  font-size: 15px;
+  border: none;
+  margin: 3px;
+  background-color: #803a15;
+  color: #ebcbb9;
+  font-weight: bold;
+  box-shadow: 2px 2px 2px #551e00, inset 2px 2px 5px #d48f6a;
 }
